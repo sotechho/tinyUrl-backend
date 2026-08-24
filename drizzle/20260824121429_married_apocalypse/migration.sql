@@ -1,0 +1,3 @@
+ALTER TABLE "users" ALTER COLUMN "emailVerificationExpires" SET DATA TYPE timestamp with time zone USING "emailVerificationExpires"::timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "users" ALTER COLUMN "createdAt" SET DATA TYPE timestamp with time zone USING "createdAt"::timestamp with time zone;--> statement-breakpoint
+ALTER TABLE "users" ALTER COLUMN "updatedAt" SET DATA TYPE timestamp with time zone USING "updatedAt"::timestamp with time zone;
