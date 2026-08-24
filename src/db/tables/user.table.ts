@@ -8,6 +8,9 @@ export const usersTable = pgTable('users', {
   isActive: boolean().default(true),
   isEmailVerified: boolean().default(false),
   refreshToken: text(),
+  emailVerificationToken: text(),
+  emailVerificationExpires: date(),
+  role: text().default('user'),
   createdAt: date().defaultNow().notNull(),
   updatedAt: date().defaultNow().notNull(),
 });
