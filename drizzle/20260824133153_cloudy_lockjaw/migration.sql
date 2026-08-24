@@ -7,8 +7,8 @@ CREATE TABLE "users" (
 	"isEmailVerified" boolean DEFAULT false,
 	"refreshToken" text,
 	"emailVerificationToken" text,
-	"emailVerificationExpires" date,
+	"emailVerificationExpires" timestamp with time zone,
 	"role" text DEFAULT 'user',
-	"createdAt" date DEFAULT now() NOT NULL,
-	"updatedAt" date DEFAULT now() NOT NULL
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL
 );
