@@ -3,6 +3,8 @@ import cors from 'cors';
 import express, { type Request, type Response } from 'express';
 import helmet from 'helmet';
 import { errorResponse, successResponse } from '@/utils';
+import { errorHandler } from './middlewares/error.middleware';
+import { v1Routes } from './routes';
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.get('/', function (req: Request, res: Response) {
   });
 });
 
+app.use('/api/v1', v1Routes);
+
 // NOTFOUND
 app.use((req: Request, res: Response) => {
   const url = req.originalUrl;
@@ -29,4 +33,6 @@ app.use((req: Request, res: Response) => {
 });
 
 // ERRORS
+app.use(errorHandler);
+
 export default app;
