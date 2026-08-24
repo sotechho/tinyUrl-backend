@@ -12,6 +12,9 @@ app.use(cors());
 app.use(express.json());
 
 // ROUTES
+app.get('/', function (req: Request, res: Response) {
+  return res.status(200).json({ status: 'Ok', timestamp: Date().toString() });
+});
 
 // NOTFOUND
 app.use((req: Request, res: Response) => {
