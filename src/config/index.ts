@@ -5,4 +5,7 @@ dotenv.config();
 export const config = {
   ndeoEnv: process.env.NODE_ENV || 'development',
   port: process.env.PORT || 8800,
+  database: {
+    url: process.env.DATABASE_URL!,
+  },
 };

@@ -4,14 +4,24 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun --watch src/index.ts"
+    "dev": "bun --watch src/index.ts",
+    "db:generate": "bunx drizzle-kit generate",
+    "db:migrate": "bunx drizzle-kit migrate",
+    "db:push": "bunx drizzle-kit push",
+    "db:pull": "bunx drizzle-kit pull",
+    "db:check": "bunx drizzle-kit check",
+    "db:up": "bunx drizzle-kit up",
+    "db:studio": "bunx drizzle-kit studio",
+    "db:export": "bunx drizzle-kit export"
   },
   "devDependencies": {
     "@types/bun": "latest",
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^8.2.3",
-    "@types/express": "^5.0.6"
+    "@types/express": "^5.0.6",
+    "@types/pg": "^8.23.1",
+    "drizzle-kit": "^1.0.0-rc.4"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -20,8 +30,10 @@
     "compression": "^1.8.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
+    "drizzle-orm": "^1.0.0-rc.4",
     "express": "^5.2.1",
     "helmet": "^8.3.0",
+    "pg": "^8.23.0",
     "winston": "^3.19.0"
   }
 }
