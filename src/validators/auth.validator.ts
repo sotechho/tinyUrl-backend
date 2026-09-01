@@ -12,9 +12,20 @@ export const registerSchema = z.object({
     .regex(/[0-9]/, 'Password must contain at least one number'),
 });
 
+export const loginSchema = z.object({
+  email: z.email({ error: 'Invalid email' }).trim().toLowerCase(),
+  password: z.string().min(1, 'Password is required').trim(),
+});
+
 export const verifyEmailSchema = z.object({
   token: z.string().trim().min(1, 'Token is required'),
 });
 
+export const resendVerificationSchema = z.object({
+  email: z.email({ error: 'Invalid email' }).trim().toLowerCase(),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
+export type LoginInput = z.infer<typeof loginSchema>;
 export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;
