@@ -1,6 +1,11 @@
 import { db } from '@/db';
 import { usersTable } from '@/db/tables';
-import { AppError, ConflictError } from '@/utils';
+import {
+  AppError,
+  BadRequestError,
+  ConflictError,
+  NotFoundError,
+} from '@/utils';
 import logger from '@/utils/logger';
 import type { RegisterInput } from '@/validators';
 import { eq } from 'drizzle-orm';
@@ -55,6 +60,72 @@ class AuthService {
         throw error;
       }
       throw new AppError('Failed user registeration');
+    }
+  }
+
+  async verifyEmail(token: string): Promise<void> {
+    try {
+      // find user by token
+      const [user] = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.emailVerificationToken, token));
+
+      // check if user exists
+      if (!user) {
+        logger.error('user not found with verification token:', { token });
+        throw new NotFoundError('user not found');
+      }
+
+      logger.info('user found with verification token:', {
+        token,
+        userId: user.id,
+      });
+
+      // check if user is active
+      if (!user.isActive) {
+        logger.error('user is not active:', { token });
+        throw new BadRequestError(
+          'your account has been deactivated please contact support',
+        );
+      }
+
+      // check if user is already verified
+      if (user.isEmailVerified) {
+        logger.error('user is already verified:', { token });
+        throw new ConflictError('user is already verified');
+      }
+      // check if token is expired
+      const isTokenExpired = verificationService.isTokenExpired(
+        user.emailVerificationExpires as Date,
+      );
+
+      if (isTokenExpired) {
+        logger.error('user verification token expired:', { token });
+        throw new BadRequestError(
+          'verification token expired please request again',
+        );
+      }
+      // update user to verified and send welcome email
+      await db
+        .update(usersTable)
+        .set({
+          isEmailVerified: true,
+          emailVerificationToken: null,
+          emailVerificationExpires: null,
+        })
+        .where(eq(usersTable.id, user.id));
+
+      const username = (user.username || user.email.split('@')[0]) as string;
+      await mailService.sendWelcomeEmail(user.email, username);
+    } catch (error: any) {
+      logger.error('Failed user email verification', {
+        ...error,
+      });
+      if (error instanceof AppError) {
+        throw error;
+      }
+      throw new AppError('Failed user email verification');
     }
   }
 }

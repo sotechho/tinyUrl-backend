@@ -14,7 +14,7 @@ class VerificationService {
     return expires;
   }
 
-  isTokenExpires(expires: Date): boolean {
+  isTokenExpired(expires: Date): boolean {
     return new Date() > expires;
   }
 }

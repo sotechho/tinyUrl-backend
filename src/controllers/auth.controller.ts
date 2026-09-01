@@ -7,3 +7,10 @@ export async function register(req: Request, res: Response) {
   await authService.register(data);
   return createdResponse(res, 'User registered successfully');
 }
+
+
+export async function verifyEmail(req: Request, res: Response) {
+  const { token } = req.query;
+  await authService.verifyEmail(token as string);
+  return createdResponse(res, 'Email verified successfully');
+}
