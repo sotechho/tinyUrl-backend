@@ -41,6 +41,7 @@ export const config = {
   database: {
     url: process.env.DATABASE_URL!,
   },
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
   jwt,
   smtp,
 };
