@@ -1,0 +1,17 @@
+Welcome to Linkora
+
+Hi {{name}},
+
+Your email has been successfully verified, and your Linkora account is ready to go.
+
+You can now start creating short, easy-to-share links and manage them all from your dashboard.
+
+Go to your dashboard:
+{{dashboardUrl}}
+
+We're glad to have you with us. Thanks for choosing Linkora!
+
+If you have any questions or need help, feel free to contact our support team.
+
+Best regards,
+The Linkora Team

@@ -157,6 +157,27 @@ class MailService {
       );
     }
   }
+
+  async sendWelcomeEmail(email: string, username: string): Promise<void> {
+    try {
+      await this.sendTemplateEmail(email, 'Welcome to Linkora', 'welcome', {
+        name: username,
+        dashboardUrl: `${config.frontendUrl}/dashboard`,
+      });
+    } catch (error: any) {
+      logger.error(`Failed to send welcome email to: ${email}`, {
+        username,
+        ...error,
+      });
+      if (error instanceof AppError) {
+        throw error;
+      }
+      throw new ExternalServiceError(
+        'Failed to send welcome email',
+        'email:smtp service',
+      );
+    }
+  }
 }
 
 export const mailService = new MailService();
