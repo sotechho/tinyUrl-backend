@@ -1,0 +1,16 @@
+Welcome to Linkora 👋
+
+Hi {{name}},
+
+Thanks for creating your account. You're one step away from getting started.
+
+Please verify your email address by clicking the link below:
+
+{{verificationUrl}}
+
+This verification link will expire in 15 minutes.
+
+If you didn't create a Linkora account, you can safely ignore this email.
+
+Best regards,
+The Linkora Team
