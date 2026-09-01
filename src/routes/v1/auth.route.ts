@@ -1,9 +1,15 @@
 import { authController } from '@/controllers';
+import { authenticate } from '@/middlewares/auth.middleware';
 import {
   validateQuery,
   validateRequest,
 } from '@/middlewares/validator.middleware';
-import { registerSchema, verifyEmailSchema } from '@/validators/auth.validator';
+import {
+  loginSchema,
+  registerSchema,
+  resendVerificationSchema,
+  verifyEmailSchema,
+} from '@/validators/auth.validator';
 import express from 'express';
 
 const router = express.Router();
@@ -14,10 +20,20 @@ router.post(
   authController.register,
 );
 
+router.post('/login', validateRequest(loginSchema), authController.login);
+
 router.get(
   '/verify-email',
   validateQuery(verifyEmailSchema),
   authController.verifyEmail,
 );
+
+router.post(
+  '/resend-verification',
+  validateRequest(resendVerificationSchema),
+  authController.resendVerification,
+);
+
+router.get('/me', authenticate, authController.me);
 
 export default router;
