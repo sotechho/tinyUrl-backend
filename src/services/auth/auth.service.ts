@@ -337,6 +337,114 @@ class AuthService {
       throw new AppError('Failed to get user profile');
     }
   }
+
+  async refreshToken(refreshToken: string): Promise<{
+    accessToken: string;
+    refreshToken: string;
+  }> {
+    try {
+      if (!refreshToken) {
+        logger.warn('Refresh token is missing from request');
+        throw new UnauthorizedError('Refresh token is required');
+      }
+
+      const refreshPayload = tokenService.verifyRefreshToken(refreshToken);
+      const [user] = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.id, refreshPayload.userId));
+
+      if (!user) {
+        logger.warn('Refresh token rejected because user was not found', {
+          userId: refreshPayload.userId,
+        });
+        throw new UnauthorizedError('Invalid refresh token');
+      }
+
+      if (!user.refreshToken || user.refreshToken !== refreshToken) {
+        logger.warn('Refresh token rejected because it does not match database', {
+          userId: user.id,
+        });
+        throw new UnauthorizedError('Invalid refresh token');
+      }
+
+      // Generate fresh access and refresh tokens after verifying the stored token.
+      const tokens = tokenService.generateAccessAndRefreshTokens({
+        userId: user.id,
+        email: user.email,
+        role: user.role || 'user',
+      });
+
+      await db
+        .update(usersTable)
+        .set({
+          refreshToken: tokens.refreshToken,
+          updatedAt: new Date(),
+        })
+        .where(eq(usersTable.id, user.id));
+
+      logger.info('Refresh token rotated successfully', {
+        userId: user.id,
+      });
+
+      return {
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
+      };
+    } catch (error: any) {
+      logger.error('Failed to refresh token', {
+        ...error,
+      });
+
+      if (error instanceof AppError) {
+        throw error;
+      }
+
+      throw new AppError('Failed to refresh token');
+    }
+  }
+
+  async logout(userId: string): Promise<void> {
+    try {
+      if (!userId) {
+        logger.warn('Logout failed because user id is missing');
+        throw new UnauthorizedError('User is required');
+      }
+
+      const [user] = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.id, userId));
+
+      if (!user) {
+        logger.warn('Logout failed because user was not found', {
+          userId,
+        });
+        throw new NotFoundError('User not found');
+      }
+
+      await db
+        .update(usersTable)
+        .set({
+          refreshToken: null,
+          updatedAt: new Date(),
+        })
+        .where(eq(usersTable.id, user.id));
+
+      logger.info('User logged out successfully', {
+        userId: user.id,
+      });
+    } catch (error: any) {
+      logger.error('Failed user logout', {
+        ...error,
+      });
+
+      if (error instanceof AppError) {
+        throw error;
+      }
+      throw new AppError('Failed user logout');
+    }
+  }
   // helper methods
   private normalizeEmail(email: string): string {
     return email.trim().toLowerCase();

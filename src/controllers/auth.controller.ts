@@ -46,3 +46,46 @@ export async function me(req: Request, res: Response) {
   const user = await authService.me(userId as string);
   return successResponse(res, 'User profile retrieved successfully', user);
 }
+
+function getRefreshTokenFromRequest(req: Request): string | undefined {
+  const cookieToken = req.cookies?.refreshToken;
+  if (cookieToken) {
+    return cookieToken;
+  }
+
+  const authorizationHeader = req.headers.authorization;
+  if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
+    return undefined;
+  }
+
+  return authorizationHeader.substring(7, authorizationHeader.length).trim();
+}
+
+export async function refreshToken(req: Request, res: Response) {
+  const refreshToken = getRefreshTokenFromRequest(req);
+
+  const { accessToken, refreshToken: newRefreshToken } =
+    await authService.refreshToken(refreshToken as string);
+
+  res.cookie('accessToken', accessToken, {
+    ...cookieOptions,
+    maxAge: 15 * 60 * 1000,
+  });
+  res.cookie('refreshToken', newRefreshToken, {
+    ...cookieOptions,
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  return successResponse(res, 'Token refreshed successfully');
+}
+
+export async function logout(req: Request, res: Response) {
+  const userId = req.user?.id;
+
+  await authService.logout(userId as string);
+
+  res.clearCookie('accessToken', cookieOptions);
+  res.clearCookie('refreshToken', cookieOptions);
+
+  return successResponse(res, 'Logout successful', null);
+}

@@ -12,7 +12,7 @@ export async function authenticate(
   next: NextFunction,
 ): Promise<void> {
   try {
-    let token = req.cookies.accessToken;
+    let token = req.cookies?.accessToken;
 
     if (!token) {
       const authorizationHeader = req.headers.authorization;
